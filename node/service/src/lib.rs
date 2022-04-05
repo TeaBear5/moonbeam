@@ -22,6 +22,7 @@
 //! Full Service: A complete parachain node including the pool, rpc, network, embedded relay chain
 //! Dev Service: A leaner service without the relay chain backing.
 
+use std::convert::TryInto;
 use cli_opt::{EthApi as EthApiCmd, RpcConfig};
 use fc_consensus::FrontierBlockImport;
 use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
@@ -541,11 +542,12 @@ where
 			}
 		};
 
-	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCache::new(
+	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
 		task_manager.spawn_handle(),
 		overrides.clone(),
-		rpc_config.eth_log_block_cache,
-		rpc_config.eth_log_block_cache,
+		rpc_config.eth_log_block_cache.try_into().unwrap(),
+		rpc_config.eth_log_block_cache.try_into().unwrap(),
+        prometheus_registry.clone(),
 	));
 
 	let rpc_extensions_builder = {
@@ -949,11 +951,12 @@ where
 			}
 		};
 
-	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCache::new(
+	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
 		task_manager.spawn_handle(),
 		overrides.clone(),
-		rpc_config.eth_log_block_cache,
-		rpc_config.eth_log_block_cache,
+		rpc_config.eth_log_block_cache.try_into().unwrap(),
+		rpc_config.eth_log_block_cache.try_into().unwrap(),
+        prometheus_registry.clone(),
 	));
 
 	let rpc_extensions_builder = {
